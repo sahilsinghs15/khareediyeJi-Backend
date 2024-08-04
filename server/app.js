@@ -1,5 +1,7 @@
 import { configDotenv } from "dotenv";
+import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import express from "express";
 import userRoutes from "./routes/user.routes.js";
 import errorMiddleware from "./middlewares/errormiddleware.js";
@@ -11,10 +13,20 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
+
+const corsOptions = {
+  origin: 'http://localhost:5173', // Specify the exact origin
+  credentials: true, // Allow credentials
+};
+
+app.use(cors(corsOptions));
+
+app.use(morgan('dev'));
 app.use(cookieParser());
-// app.use("/" , (_req , res)=>{
-//     res.send("Pong");
-// })
+
+app.get("/" , (_req , res)=>{
+    res.send("Pong");
+})
 
 app.use("/api/v1/user" ,userRoutes );
 
