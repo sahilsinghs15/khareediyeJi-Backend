@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import express from "express";
 import userRoutes from "./routes/user.routes.js";
+import productRoutes from "./routes/product.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 import errorMiddleware from "./middlewares/errormiddleware.js";
 
 //to load the .dotenv file
@@ -29,6 +31,8 @@ app.get("/" , (_req , res)=>{
 })
 
 app.use("/api/v1/user" ,userRoutes );
+app.use("api/v1/product", productRoutes);
+app.use("/api/v1/order",orderRoutes);
 
 //return 404 for other routes
 app.use("*" , (_req, res)=>{
