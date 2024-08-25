@@ -1,0 +1,51 @@
+import asyncHandler from 'express-async-handler';
+import User from '../models/user.model.js';
+import AppError from '../utils/appError.js';
+import sendEmail from '../utils/sendEmail.js';
+
+/**
+ * @CONTACT_US
+ * @ROUTE @POST {{URL}}/api/v1/contact
+ * @ACCESS Public
+ */
+export const contactUs = asyncHandler(async (req, res, next) => {
+  // Destructuring the required data from req.body
+  const { name, email, message } = req.body;
+
+  // Checking if values are valid
+  if (!name || !email || !message) {
+    return next(new AppError('Name, Email, Message are required'));
+  }
+
+  try {
+    const subject = 'Contact Us Form';
+    const textMessage = `${name} - ${email} <br /> ${message}`;
+
+    // Await the send email
+    await sendEmail(process.env.CONTACT_US_EMAIL, subject, textMessage);
+  } catch (error) {
+    console.log(error);
+    return next(new AppError(error.message, 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Your request has been submitted successfully',
+  });
+});
+
+/**
+ * @USER_STATS_ADMIN
+ * @ROUTE @GET {{URL}}/api/v1/admin/stats/users
+ * @ACCESS Private(ADMIN ONLY)
+ */
+export const userStats = asyncHandler(async (req, res, next) => {
+  const allUsersCount = await User.countDocuments();
+
+  res.status(200).json({
+    success: true,
+    message: 'All registered users count',
+    allUsersCount,
+
+  });
+});

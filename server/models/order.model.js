@@ -48,9 +48,10 @@ const orderSchema = new Schema({
     },
   },
   paymentInfo: {
-    id: {
+    method: {
       type: String,
-      required: true,
+      enum: ['Paid', 'Unpaid', 'COD'],
+      default: 'Unpaid',
     },
     status: {
       type: String,
@@ -85,6 +86,8 @@ const orderSchema = new Schema({
 {
   timestamps: true,
 });
+
+
 
 const Order = model('Order', orderSchema);
 

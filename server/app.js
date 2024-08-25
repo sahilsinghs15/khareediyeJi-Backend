@@ -6,6 +6,8 @@ import express from "express";
 import userRoutes from "./routes/user.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import miscRoutes from "./routes/miscellaneous.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
 import errorMiddleware from "./middlewares/errormiddleware.js";
 
 //to load the .dotenv file
@@ -31,8 +33,10 @@ app.get("/" , (_req , res)=>{
 })
 
 app.use("/api/v1/user" ,userRoutes );
-app.use("api/v1/product", productRoutes);
+app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/order",orderRoutes);
+app.use("/api/v1/cart",cartRoutes);
+app.use("api/v1",miscRoutes);
 
 //return 404 for other routes
 app.use("*" , (_req, res)=>{
