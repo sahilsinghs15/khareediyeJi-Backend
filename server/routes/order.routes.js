@@ -7,6 +7,7 @@ import {
   getOrders,
 } from '../controllers/order.controller.js';
 import { isLoggedIn, authorizeRoles } from '../middlewares/authmiddleware.js';
+import Order from '../models/order.model.js';
 
 const router = express.Router();
 
@@ -15,7 +16,14 @@ const router = express.Router();
  * @ROUTE @POST {{URL}}/api/v1/orders
  * @ACCESS User
  */
-router.route('/').post(isLoggedIn, createOrder);
+router.route('/')
+  .post(isLoggedIn, (req, res, next) => {
+    req.body.paymentInfo = {
+      method: req.body.paymentInfo.method || 'COD', // Default to COD if not provided
+      status: 'Pending' // Default status
+    };
+    next();
+  }, createOrder);
 
 /**
  * @GET_ORDER, @UPDATE_ORDER_STATUS, @DELETE_ORDER

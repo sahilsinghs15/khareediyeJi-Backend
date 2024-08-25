@@ -1,4 +1,5 @@
 import Order from '../models/order.model.js';
+import Product from '../models/product.model.js';
 import asyncHandler from 'express-async-handler';
 import appError from '../utils/appError.js';
 
@@ -12,19 +13,40 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     orderItems,
     shippingAddress,
     paymentInfo,
-    totalPrice,
   } = req.body;
 
   if (!orderItems || orderItems.length === 0) {
     return next(new appError('No order items', 400));
   }
 
+  // Fetch product details and calculate total price
+  const detailedOrderItems = await Promise.all(
+    orderItems.map(async (item) => {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return next(new appError(`Product with id ${item.product} not found`, 404));
+      }
+      return {
+        product: item.product,
+        quantity: item.quantity,
+        price: product.price,
+      };
+    })
+  );
+
+  const totalPrice = detailedOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // Make sure req.user is populated correctly
+  if (!req.user || !req.user._id) {
+    return next(new appError('User not authenticated', 401));
+  }
+
   const order = new Order({
-    user: req.user._id,
-    orderItems,
+    user: req.user._id, // Ensure this is set correctly
+    orderItems: detailedOrderItems,
     shippingAddress,
     paymentInfo,
-    totalPrice,
+    totalPrice, // Set totalPrice here
   });
 
   const createdOrder = await order.save();
@@ -35,6 +57,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     order: createdOrder,
   });
 });
+
 
 /**
  * @GET_ORDER
