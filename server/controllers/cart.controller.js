@@ -15,7 +15,7 @@ export const addToCart = asyncHandler(async (req, res, next) => {
     return next(new AppError('Product ID and quantity are required', 400));
   }
 
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user.id);
 
   if (!user) {
     return next(new AppError('User not found', 404));
@@ -53,7 +53,7 @@ export const updateCartItem = asyncHandler(async (req, res, next) => {
     return next(new AppError('Product ID and quantity are required', 400));
   }
 
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user.id);
 
   if (!user) {
     return next(new AppError('User not found', 404));
@@ -88,13 +88,13 @@ export const updateCartItem = asyncHandler(async (req, res, next) => {
  * @ACCESS Private
  */
 export const removeFromCart = asyncHandler(async (req, res, next) => {
-  const { productId } = req.body;
+  const { productId } = req.params;
 
   if (!productId) {
     return next(new AppError('Product ID is required', 400));
   }
 
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user.id);
 
   if (!user) {
     return next(new AppError('User not found', 404));
@@ -117,7 +117,7 @@ export const removeFromCart = asyncHandler(async (req, res, next) => {
  * @ACCESS Private
  */
 export const getCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate('cart.product');
+  const user = await User.findById(req.user.id).populate('cart.product');
 
   if (!user) {
     return next(new AppError('User not found', 404));
