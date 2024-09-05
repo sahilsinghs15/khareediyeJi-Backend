@@ -4,6 +4,7 @@ import appError from "../utils/appError.js";
 import crypto from "crypto";
 import fs from "fs/promises";
 import sendEmailPassReset from "../utils/sendEmailResetPassword.js";
+import cloudinary from 'cloudinary';
 
 const cookieOptions = {
   secure: process.env.NODE_ENV === 'production' ? true : false,

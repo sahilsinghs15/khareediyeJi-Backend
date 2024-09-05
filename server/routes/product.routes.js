@@ -6,6 +6,7 @@ import {
   getProduct,
   getProducts,
   getProductByName,
+  getProductsByCategory,
 } from '../controllers/product.controller.js';
 import { isLoggedIn, authorizeRoles } from '../middlewares/authmiddleware.js';
 
@@ -34,5 +35,6 @@ router.route('/:id')
  * @ACCESS Public
  */
 router.route('/name/:name').get(getProductByName);
+router.route('/category/:category').get(getProductsByCategory);
 
 export default router;
