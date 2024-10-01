@@ -36,7 +36,7 @@ app.use("/api/v1/user" ,userRoutes );
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/order",orderRoutes);
 app.use("/api/v1/cart",cartRoutes);
-app.use("api/v1",miscRoutes);
+app.use("/api/v1",miscRoutes);
 
 //return 404 for other routes
 app.use("*" , (_req, res)=>{

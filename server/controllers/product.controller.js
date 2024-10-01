@@ -108,45 +108,40 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * @GET_BY_NAME
- * @ROUTE @GET {{URL}}/api/v1/products/name/:name
+ * @GET_BY_QUERY
+ * @ROUTE @GET {{URL}}/api/v1/products/search
  * @ACCESS Public
  */
-export const getProductByName = asyncHandler(async (req, res, next) => {
-  const { name } = req.params;
+export const getProductByQuery = asyncHandler(async (req, res, next) => {
+  const { query } = req.query;
 
-  // Construct a regular expression for a case-insensitive search with partial matches
-  const regex = new RegExp(name, 'i');
+  let searchQuery = {};
+  let isPriceQuery = !isNaN(query); 
 
-  // Find products where the name matches the regular expression
-  const products = await Product.find({ name: regex });
+  if (query) {
+    if (isPriceQuery) {
+      const priceValue = parseFloat(query);
+      searchQuery.price = { 
+        $gte: priceValue * 0.8,  
+        $lte: priceValue * 1.2   
+      };
+    } else {
+      searchQuery.$or = [
+        { name: { $regex: query, $options: 'i' } },      
+        { category: { $regex: query, $options: 'i' } }  
+      ];
+    }
+  }
 
-  if (!products || products.length === 0) {
-    return next(new appError('No products found with this name', 404));
+  const productData = await Product.find(searchQuery);
+
+  if (!productData || productData.length === 0) {
+    return next(new appError("No products found", 404));
   }
 
   res.status(200).json({
     success: true,
-    products,
+    products: productData,
   });
 });
 
-/**
- * @GET_BY_CATEGORY
- * @ROUTE @GET {{URL}}/api/v1/products/category/:category
- * @ACCESS Public
- */
-export const getProductsByCategory = asyncHandler(async (req, res, next) => {
-  const { category } = req.params;
-
-  const products = await Product.find({ category: new RegExp('^' + category + '$', 'i') });
-
-  if (!products || products.length === 0) {
-    return next(new appError('No products found in this category', 404));
-  }
-
-  res.status(200).json({
-    success: true,
-    products,
-  });
-});

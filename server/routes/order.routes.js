@@ -5,9 +5,10 @@ import {
   updateOrderStatus,
   deleteOrder,
   getOrders,
+  getUserOrders,
 } from '../controllers/order.controller.js';
 import { isLoggedIn, authorizeRoles } from '../middlewares/authmiddleware.js';
-import Order from '../models/order.model.js';
+
 
 const router = express.Router();
 
@@ -30,16 +31,18 @@ router.route('/')
  * @ROUTE @GET, @PUT, @DELETE {{URL}}/api/v1/orders/:id
  * @ACCESS User (GET), Admin (PUT, DELETE)
  */
-router.route('/:id')
-  .get(isLoggedIn, getOrderById)
-  .put(isLoggedIn, authorizeRoles('ADMIN'), updateOrderStatus)
-  .delete(isLoggedIn, authorizeRoles('ADMIN'), deleteOrder);
 
 /**
  * @GET_ORDERS
  * @ROUTE @GET {{URL}}/api/v1/orders
  * @ACCESS Admin
  */
+router.route('/orders').get(isLoggedIn,getUserOrders);
 router.route('/').get(isLoggedIn, authorizeRoles('ADMIN'), getOrders);
+router.route('/:id')
+  .get(isLoggedIn, getOrderById)
+  .put(isLoggedIn, authorizeRoles('ADMIN'), updateOrderStatus)
+  .delete(isLoggedIn, authorizeRoles('ADMIN'), deleteOrder);
+
 
 export default router;
