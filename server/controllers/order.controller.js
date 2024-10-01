@@ -37,16 +37,16 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   const totalPrice = detailedOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // Make sure req.user is populated correctly
-  if (!req.user || !req.user._id) {
+  if (!req.user || !req.user.id) {
     return next(new appError('User not authenticated', 401));
   }
 
   const order = new Order({
-    user: req.user._id, // Ensure this is set correctly
+    user: req.user.id,
     orderItems: detailedOrderItems,
     shippingAddress,
     paymentInfo,
-    totalPrice, // Set totalPrice here
+    totalPrice, 
   });
 
   const createdOrder = await order.save();
@@ -137,4 +137,24 @@ export const getOrders = asyncHandler(async (req, res, next) => {
     success: true,
     orders,
   });
+});
+
+
+/** 
+  * @GET_AllOrders
+  * @ROUTE @GET {{URL}}/api/v1/order/orders
+  * @ACCESS User
+ */
+
+export const getUserOrders = asyncHandler(async (req, res, next) => {
+    const orders = await Order.find({user:req.user.id});
+
+    if(!orders || orders.length == 0){
+      return next(new appError("No order found ",404));
+    }
+
+    res.status(200).json({
+      success:true,
+      orders,
+    })
 });
